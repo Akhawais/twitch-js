@@ -861,7 +861,7 @@ client.prototype.handleMessage = function handleMessage(message) {
               msg,
               userstate,
             );
-          } else if (msgid === 'subgift') {
+          } else if (msgid === 'subgift' || msgid === 'anonsubgift') {
             const username = message.tags['display-name'] || message.tags.login;
             const recipient =
               message.tags['msg-param-recipient-display-name'] ||
@@ -886,7 +886,7 @@ client.prototype.handleMessage = function handleMessage(message) {
             this.emit(
               'subgift',
               channel,
-              username,
+              msgid === 'anonsubgift' ? null : username,
               recipient,
               { plan, planName },
               userstate,
