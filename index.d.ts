@@ -466,6 +466,12 @@ export class Client extends EventEmitter {
    * @returns Promise([channel, username, seconds, reason])
    */
   timeout(channel: string, username: string, seconds: number, reason: string): Promise<[string, string, number, string]>;
+
+  /**
+   * Delete message on channel.
+   * @returns Promise([channel, id])
+   */
+  deletemessage(channel: string, id: string): Promise<[string, string]>;
   
   /**
    * Unban username on channel.
