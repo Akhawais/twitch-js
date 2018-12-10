@@ -131,8 +131,7 @@ client.prototype.handleMessage = function handleMessage(message) {
         // Received PONG from server, return current latency..
         case 'PONG': {
           const currDate = new Date();
-          this.currentLatency =
-            currDate.getTime() - this.latency.getTime();
+          this.currentLatency = currDate.getTime() - this.latency.getTime();
           this.emits(
             ['pong', '_promisePing'],
             [[this.currentLatency], [this.currentLatency]],
@@ -607,6 +606,25 @@ client.prototype.handleMessage = function handleMessage(message) {
               );
               break;
 
+            // Delete command success..
+            case 'delete_message_success':
+              this.log.info(`[${channel}] ${msg}`);
+              this.emits(
+                ['notice', '_promiseDelete'],
+                [[channel, msgid, msg], [null]],
+              );
+              break;
+
+            // Delete command failed..
+            case 'bad_delete_message_broadcaster':
+            case 'bad_delete_message_mod':
+              this.log.info(`[${channel}] ${msg}`);
+              this.emits(
+                ['notice', '_promiseDelete'],
+                [[channel, msgid, msg], [msgid]],
+              );
+              break;
+
             // Unhost command failed..
             case 'usage_unhost':
             case 'not_hosting':
@@ -919,6 +937,17 @@ client.prototype.handleMessage = function handleMessage(message) {
             );
             this.emit('hosting', channel, msg.split(' ')[0], viewers);
           }
+          break;
+
+        // Message removed by a moderator..
+        case 'CLEARMSG':
+          const login = _.get(message.tags['login'], null);
+          const targetMessageId = _.get(message.tags['target-msg-id']);
+
+          this.log.info(
+            `[${channel}] Message from ${login} removed. ID: ${targetMessageId} Message: ${msg}`,
+          );
+          this.emit('delete', channel, login, msg);
           break;
 
         // Someone has been timed out or chat has been cleared by a moderator..

@@ -575,6 +575,28 @@ module.exports = {
     );
   },
 
+  // Delete message on channel..
+  deletemessage: function deletemessage(channel, id) {
+    channel = _.channel(channel);
+
+    // Send the command to the server and race the Promise against a delay..
+    return this._sendCommand(
+      this._getPromiseDelay(),
+      channel,
+      `/delete ${id}`,
+      (resolve, reject) => {
+        // Received _promiseDelete event, resolve or reject..
+        this.once('_promiseDelete', err => {
+          if (!err) {
+            resolve([channel, id]);
+          } else {
+            reject(err);
+          }
+        });
+      },
+    );
+  },
+
   // Timeout username on channel for X seconds..
   timeout: function timeout(channel, username, seconds, reason) {
     channel = _.channel(channel);
